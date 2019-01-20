@@ -61,10 +61,22 @@ else
 	echo "Not touching libwacom"
 fi
 
+read -rp "Do you want to remove the example intel xorg config? (type yes or no) " removexorg;echo
+
+if [ "$removexorg" = "yes" ]; then
+	echo "Removing the example intel xorg config..."
+		rm /etc/X11/xorg.conf.d/20-intel_example.conf
+else
+	echo "Not touching example intel xorg config"
+fi
+
 if [ "$SUR_MODEL" = "Surface Pro 3" ]; then
 	echo "\nInstalling i915 firmware for Surface Pro 3...\n"
 	mkdir -p /lib/firmware/i915
 	unzip -o firmware/i915_firmware_bxt.zip -d /lib/firmware/i915/
+
+	echo "\nRemove unneeded udev rules for Surface Pro 3...\n"
+	rm /etc/udev/rules.d/98-keyboardscovers.rules
 fi
 
 if [ "$SUR_MODEL" = "Surface Pro" ]; then
