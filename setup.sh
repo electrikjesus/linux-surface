@@ -67,7 +67,17 @@ if [ "$removexorg" = "yes" ]; then
 	echo "Removing the example intel xorg config..."
 		rm /etc/X11/xorg.conf.d/20-intel_example.conf
 else
-	echo "Not touching example intel xorg config"
+	echo "Not touching example intel xorg config (/etc/X11/xorg.conf.d/20-intel_example.conf)"
+fi
+
+read -rp "Do you want to remove the example pulse audio config files? (type yes or no) " removepulse;echo
+
+if [ "$removepulse" = "yes" ]; then
+	echo "Removing the example pulse audio config files..."
+		rm /etc/pulse/daemon_example.conf
+		rm /etc/pulse/default_example.pa
+else
+	echo "Not touching example pulse audio config files (/etc/pulse/*_example.*)"
 fi
 
 if [ "$SUR_MODEL" = "Surface Pro 3" ]; then
@@ -161,11 +171,22 @@ if [ "$SUR_MODEL" = "Surface Go" ]; then
 	echo "\nInstalling ath10k firmware for Surface Go...\n"
 	mkdir -p /lib/firmware/ath10k
 	unzip -o firmware/ath10k_firmware.zip -d /lib/firmware/ath10k/
+
+	if [ ! -f "/etc/init.d/surfacego-touchscreen" ]; then
+		echo "\nPatching power control for Surface Go touchscreen...\n"
+		echo "echo \"on\" > /sys/devices/pci0000:00/0000:00:15.1/i2c_designware.1/power/control" > /etc/init.d/surfacego-touchscreen
+		chmod 755 /etc/init.d/surfacego-touchscreen
+		update-rc.d surfacego-touchscreen defaults
+	fi
 fi
 
 echo "Installing marvell firmware...\n"
 mkdir -p /lib/firmware/mrvl/
 unzip -o firmware/mrvl_firmware.zip -d /lib/firmware/mrvl/
+
+echo "Installing mwlwifi firmware...\n"
+mkdir -p /lib/firmware/mwlwifi/
+unzip -o firmware/mwlwifi_firmware.zip -d /lib/firmware/mwlwifi/
 
 read -rp "Do you want to set your clock to local time instead of UTC? This fixes issues when dual booting with Windows. (type yes or no) " uselocaltime;echo
 
